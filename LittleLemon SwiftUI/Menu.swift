@@ -12,35 +12,46 @@ struct Menu: View {
     @State var searchText: String = ""
     var body: some View {
         VStack(alignment: .leading) {
-            Text("Little Lemon").font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/).fontWeight(.bold)
-            Text("Chicago")
-                .font(.subheadline)
-            Text("ldlskfjlksdjflksdjflksdfjlllskdfjlksdjflksdfjlskdfjlsfsldkfjlskdfjldsfkjfdsldkfjlskdfj")
+            HStack {
+                Spacer()
+                Image("logo")
+                Spacer()
+                Image("profile-image-placeholder").resizable().frame(width: 48, height: 48)
+                    .scaledToFit()
+            }
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Little Lemon").font(/*@START_MENU_TOKEN@*/.title/*@END_MENU_TOKEN@*/).fontWeight(.bold)
+                    HStack {
+                        VStack(alignment: .leading) {
+                            Text("Chicago")
+                                .font(.headline)
+                            Text("We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.").font(.subheadline)
+                            Spacer()
+                        }
+                        Image("hero-image")
+                            .resizable()
+                            .frame(width: 150, height: 200)
+                            .clipShape(RoundedRectangle(cornerSize: /*@START_MENU_TOKEN@*/CGSize(width: 20, height: 10)/*@END_MENU_TOKEN@*/))
+                        Spacer()
+                    }
+                    
+                    
+                }
+                
+            }
             TextField("Search menu", text : $searchText)
             FetchedObjects(predicate: buildPredicate($searchText),sortDescriptors: buildSortDescriptors()) { (dishes: [Dish]) in
             List {
                 ForEach(dishes){ dish in
-                    HStack {
-                        Text("\(dish.title ?? "" ) : \(dish.price ?? "")")
-                        AsyncImage(
-                            url: URL(string: dish.image ?? ""),
-                            content: { image in
-                                image.resizable()
-                                    .aspectRatio(contentMode: .fit)
-                                    .frame(maxWidth: 100, maxHeight: 100)
-                            },
-                            placeholder: {
-                                ProgressView()
-                            }
-                        )
-                    }
-                    
+                    MenuListItem(dish: dish)
                 }
             }
         }
         }.onAppear {
             getMenuData()
         }
+        
         
     }
     
@@ -108,4 +119,36 @@ func buildPredicate(_ searchText: Binding<String>) -> NSPredicate {
 
 #Preview {
     Menu()
+}
+
+struct MenuListItem: View {
+    private var dish: Dish
+    init(dish: Dish) {
+        self.dish = dish
+    }
+    var body: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 0.3) {
+                Text(dish.title ?? "")
+                    .font(.headline).bold()
+                Text(dish.details ?? "")
+                    .font(.subheadline)
+                Text("$\(dish.price ?? "")")
+                    .font(.caption).bold()
+                
+            }
+            Spacer()
+            AsyncImage(
+                url: URL(string: dish.image ?? ""),
+                content: { image in
+                    image.resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(maxWidth: 50, maxHeight: 50)
+                },
+                placeholder: {
+                    ProgressView()
+                }
+            )
+        }
+    }
 }
